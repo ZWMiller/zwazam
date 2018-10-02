@@ -4,19 +4,18 @@ from scipy.io import wavfile
 import scipy.ndimage as ndi
 from scipy.ndimage.morphology import generate_binary_structure, binary_erosion
 import numpy as np
+from matplotlib.mlab import window_hanning
 
 
 class WavFingerprint:
 
-    def __init__(self, filename, chunk_seconds=5., peak_sensitivity=20, look_forward_time=20,
-                 frequency_window_range=10, min_peak_amplitude=None):
+    def __init__(self, filename, chunk_seconds=5., peak_sensitivity=20, look_forward_time=200, min_peak_amplitude=None):
         self.sample_rate, read_data = wavfile.read(filename)
         self.raw_data = np.array(read_data)
         self.chunk_seconds = chunk_seconds
         self.final_sample = self.raw_data.shape[0]
         self.peak_sensitivity = int(peak_sensitivity)
         self.look_forward_time = look_forward_time
-        self.frequency_window = frequency_window_range
         self.min_peak_amplitude = min_peak_amplitude
 
         try:
@@ -62,8 +61,8 @@ class WavFingerprint:
         Return:
         Spectrogram (Matrix object) time on x axis, frequency on y axis
         """
-        spectrogram, _, _ = specgram(data_chunk, NFFT=1024, Fs=2, noverlap=900)
-        spectrogram = 10. * np.log10(spectrogram)
+        spectrogram, _, _ = specgram(data_chunk, NFFT=4096, Fs=44100, noverlap=2048, window=window_hanning)
+        spectrogram = 10. * np.log10(spectrogram+1e-6)
         return spectrogram
 
     def detect_peaks(self, spectrogram):
@@ -89,43 +88,30 @@ class WavFingerprint:
         eroded_background = binary_erosion(background, structure=neighborhood, border_value=1)
 
         detected_peaks = local_max != eroded_background
-        return detected_peaks
+
+        if self.min_peak_amplitude:
+            filtered_peak_locations = self.filter_peaks_by_size(detected_peaks, spectrogram)
+        else:
+            filtered_peak_locations = detected_peaks
+
+        return filtered_peak_locations
 
     def process_track(self, track_data):
-        #for chunk in self._generate_chunks_of_wav(track_data):
-        #    self.hashes += self.process_chunk(chunk)
         spectrogram = self.make_spectrogram(track_data)
         peak_map = self.detect_peaks(spectrogram)
-        peak_locations = self.get_peak_locations(peak_map)
-        if self.min_peak_amplitude:
-            filtered_peak_locations = self.filter_peaks_by_size(peak_locations, spectrogram)
-        else:
-            filtered_peak_locations = peak_locations
-        partner_peaks_map = self.find_partner_peaks(filtered_peak_locations)
+        partner_peaks_map = self.find_partner_peaks(peak_map)
         list_of_hashes = self.create_hashes(partner_peaks_map)
         self.hashes = list_of_hashes
 
-
-    def process_chunk(self, data_chunk):
-        spectrogram = self.make_spectrogram(data_chunk)
-        peak_map = self.detect_peaks(spectrogram)
-        peak_locations = self.get_peak_locations(peak_map)
-        if self.min_peak_amplitude:
-            filtered_peak_locations = self.filter_peaks_by_size(peak_locations, spectrogram)
-        else:
-            filtered_peak_locations = peak_locations
-        partner_peaks_map = self.find_partner_peaks(filtered_peak_locations)
-        list_of_hashes = self.create_hashes(partner_peaks_map)
-        return list_of_hashes
-
-    def filter_peaks_by_size(self, peak_locations, spectrogram):
+    def filter_peaks_by_size(self, peak_map, spectrogram):
 
         # TO DO: Refactor to use broadcasting. Needs thought on process.
-        filtered_peaks = []
+        peak_locations = self.get_peak_locations(peak_map)
+        filtered_peaks = np.zeros_like(peak_map)
         for peak in peak_locations:
-            if 10**spectrogram[peak[0],peak[1]] > self.min_peak_amplitude:
-                filtered_peaks.append(peak)
-        return np.array(filtered_peaks)
+            if spectrogram[peak[0],peak[1]] > self.min_peak_amplitude:
+                filtered_peaks[peak[0],peak[1]] = 1
+        return filtered_peaks
 
     def create_hashes(self, partner_peaks_map):
 
@@ -145,7 +131,7 @@ class WavFingerprint:
         #return (x_difference * 0x1f1f1f1f) ^ y_difference
         return (x_difference, y_difference)
 
-    def find_partner_peaks(self, peak_locations):
+    def find_partner_peaks(self, peak_map):
         """
         Takes in a peak map and draws up relationships between peaks in a certain window
         of time and frequency. Time is always looking forward from each peak to the next ones,
@@ -160,15 +146,12 @@ class WavFingerprint:
         dictionary of format {peak: [partner peaks]}
         """
         partner_peak_map = {}
+        peak_locations = self.get_peak_locations(peak_map)
         for peak in peak_locations:
             time_max_value = peak[0] + self.look_forward_time
             time_min_value = peak[0]
-            freq_max_value = peak[1] + self.frequency_window
-            freq_min_value = peak[1] - self.frequency_window
             time_condition = (peak_locations[:,0] > time_min_value) & (peak_locations[:,0] < time_max_value)
             found_peaks = peak_locations[time_condition]
-            frequency_condition = (found_peaks[:, 1] > freq_min_value) & (found_peaks[:, 1] < freq_max_value)
-            found_peaks = found_peaks[frequency_condition]
             list_of_partners = found_peaks.tolist()
             if list_of_partners:
                 partner_peak_map[tuple(peak)] = list_of_partners
@@ -198,12 +181,11 @@ class WavFingerprint:
         plt.show()
 
 if __name__ == "__main__":
-    track = WavFingerprint("test_wav/test_v1.wav", peak_sensitivity=20)
-    track.process_track(track.raw_data_left)
-    print(len(track.hashes))
-    print(len(set(track.hashes)))
+    track = WavFingerprint("test_wav/Bust_This_Bust_That.wav", peak_sensitivity=20, min_peak_amplitude=100)
+    #track.process_track(track.raw_data_left)
+    #print(len(track.hashes))
+    #print(len(set(track.hashes)))
 
 
-    #spectrogram = track.make_spectrogram(section)
-    #track._plot_spectrograms(spectrogram)
-    #print(track.process_chunk(section))
+    spectrogram = track.make_spectrogram(track.raw_data_left)
+    track._plot_spectrograms(spectrogram)
