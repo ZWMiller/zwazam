@@ -17,6 +17,9 @@ def connect_to_sql():
 def process_batch_files(path):
     cursor = connect_to_sql()
     base_insert_query = "INSERT INTO zwazam(track, hash) VALUES ('{}', {});"
+    if path[-1] == "/":
+        path = path[:-1]
+
     for file in glob("{}/*.wav".format(path)):
         print("Working on File", file)
         track = WavFingerprint(file, min_peak_amplitude=50)
