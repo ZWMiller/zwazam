@@ -17,6 +17,7 @@ class WavFingerprint:
         self.peak_sensitivity = int(peak_sensitivity)
         self.look_forward_time = look_forward_time
         self.min_peak_amplitude = min_peak_amplitude
+        self.hashes = None
 
         try:
             self.raw_data_left = self.raw_data[:, 0]
@@ -128,8 +129,7 @@ class WavFingerprint:
         return np.argwhere(peak_map == 1)
 
     def hash_function(self, x_difference, y_difference):
-        #return (x_difference * 0x1f1f1f1f) ^ y_difference
-        return (x_difference, y_difference)
+        return (x_difference * 0x1f1f1f1f) ^ y_difference
 
     def find_partner_peaks(self, peak_map):
         """
@@ -177,11 +177,10 @@ class WavFingerprint:
         plt.ylabel("Frequency")
         axes[0].set_ylabel("Frequency")
         plt.tight_layout()
-        print("Done")
         plt.show()
 
 if __name__ == "__main__":
-    track = WavFingerprint("test_wav/Bust_This_Bust_That.wav", peak_sensitivity=20, min_peak_amplitude=100)
+    track = WavFingerprint("test_wav/Bust_This_Bust_That.wav", peak_sensitivity=20, min_peak_amplitude=40)
     #track.process_track(track.raw_data_left)
     #print(len(track.hashes))
     #print(len(set(track.hashes)))
@@ -189,3 +188,5 @@ if __name__ == "__main__":
 
     spectrogram = track.make_spectrogram(track.raw_data_left)
     track._plot_spectrograms(spectrogram)
+    track.process_track(track.raw_data_left)
+    print(track.hashes)
