@@ -8,7 +8,7 @@ from matplotlib.mlab import window_hanning
 
 class ProcessAudio:
 
-    def __init__(self, chunk_seconds=5., peak_sensitivity=20, look_forward_time=200, min_peak_amplitude=None):
+    def __init__(self, chunk_seconds=5., peak_sensitivity=20, look_forward_time=70, min_peak_amplitude=None):
         """
         Parent class for processing audio clips and extracting fingerprints via peaks
         in the spectrogram. This class does not accept input and should only be used
