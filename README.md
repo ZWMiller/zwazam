@@ -10,6 +10,10 @@ hashes are stored in a database with metadata about the song. When an unknown bi
 of song is fingerprinted, we can look up what song shares the most
 similarities with the new bit and identify the unknown song.
 
+An example of the spectrogram and associated peaks can be seen here:
+
+![Spectrogram and Peaks](images/spectrogram_peaks_demo.png)
+
 **THIS IS STILL UNDER CONSTRUCTION**
 
 #### Proof of Concept
