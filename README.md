@@ -16,7 +16,7 @@ An example of the spectrogram and associated peaks can be seen here:
 
 **THIS IS STILL UNDER CONSTRUCTION**
 
-#### Proof of Concept
+#### Proof of Concept from WAV
 
 1. Start PSQL
 2. `bash database_management_scripts/setup_psql.sh`
@@ -26,8 +26,11 @@ An example of the spectrogram and associated peaks can be seen here:
 Output:
 > Bust_This_Bust_That.wav
 
-
 Match Counts (not shown currently):
 >(DEBUG ONLY) {'I_Want_To_Destroy_Something_Beautiful.wav': 11, 
 'Bust_This_Bust_That.wav': 53, 'jazz_club.wav': 6, 
 'Sonic_Marble_Zone.wav': 4, 'SMB_Overworld.wav': 4})
+
+#### Proof of Concept from Microphone
+
+See video here: https://youtu.be/YW9NZtL9Xi4
