@@ -2,6 +2,9 @@ import psycopg2 as pg
 from wav_fingerprint import WavFingerprint
 import sys
 from collections import defaultdict
+from zwazam_settings import *
+
+DEBUG = True
 
 def connect_to_sql():
     connection_args = {
@@ -24,13 +27,16 @@ def match_file(file_path):
     match_counter = defaultdict(int)
     base_match_query = "SELECT track, count(hash) FROM zwazam WHERE hash = {} GROUP BY track"
 
-    new_track = WavFingerprint(file_path, min_peak_amplitude=50)
+    new_track = WavFingerprint(file_path, min_peak_amplitude=MIN_FINGER_PRINT_WAV)
     for hash in set(new_track.hashes):
         cursor.execute(base_match_query.format(int(hash)))
         for track_name, count in cursor.fetchall():
             match_counter[track_name] += count
-    best_match = sorted(match_counter.items(), key=lambda x: x[1], reverse=True)[0][0]
-    return best_match
+    sorted_matches = sorted(match_counter.items(), key=lambda x: x[1], reverse=True)
+    if DEBUG:
+        return sorted_matches
+    else:
+        return sorted_matches[0][0]
 
 
 def parse_args(user_arguments):

@@ -2,6 +2,9 @@ import psycopg2 as pg
 from recording_fingerprint import RecordingFingerprint
 import sys
 from collections import defaultdict
+from zwazam_settings import *
+
+DEBUG = True
 
 def connect_to_sql():
     connection_args = {
@@ -24,13 +27,16 @@ def match_recording():
     match_counter = defaultdict(int)
     base_match_query = "SELECT track, count(hash) FROM zwazam WHERE hash = {} GROUP BY track"
 
-    new_track = RecordingFingerprint(min_peak_amplitude=5)
+    new_track = RecordingFingerprint(min_peak_amplitude=MIN_FINGER_PRINT_MIC)
     for hash in set(new_track.hashes):
         cursor.execute(base_match_query.format(int(hash)))
         for track_name, count in cursor.fetchall():
             match_counter[track_name] += count
-    best_match = sorted(match_counter.items(), key=lambda x: x[1], reverse=True)[0][0]
-    return match_counter
+    sorted_matches = sorted(match_counter.items(), key=lambda x: x[1], reverse=True)
+    if DEBUG:
+        return sorted_matches
+    else:
+        return sorted_matches[0][0]
 
 
 def parse_args(user_arguments):

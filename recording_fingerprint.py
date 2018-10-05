@@ -62,7 +62,7 @@ class RecordingFingerprint(ProcessAudio):
         return b''.join(frames)
 
 if __name__ == "__main__":
-    track = RecordingFingerprint(peak_sensitivity=20, min_peak_amplitude=None)
+    track = RecordingFingerprint(peak_sensitivity=10, min_peak_amplitude=None)
     spectrogram = track.make_spectrogram(track.raw_data)
     track._plot_spectrograms(spectrogram)
     #print(track.hashes)

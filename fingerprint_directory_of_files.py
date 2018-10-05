@@ -2,6 +2,7 @@ import psycopg2 as pg
 from wav_fingerprint import WavFingerprint
 from glob import glob
 import sys
+from zwazam_settings import *
 
 
 def connect_to_sql():
@@ -22,7 +23,7 @@ def process_batch_files(path):
 
     for file in glob("{}/*.wav".format(path)):
         print("Working on File", file)
-        track = WavFingerprint(file, min_peak_amplitude=50)
+        track = WavFingerprint(file, min_peak_amplitude=MIN_FINGER_PRINT_WAV)
         track.process_track(track.raw_data_left)
         track_name = file.split(('/'))[-1]
         for hash in set(track.hashes):
