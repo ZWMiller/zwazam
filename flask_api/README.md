@@ -1,7 +1,14 @@
 # A simple model-based prediction app
 
-Running `predictor_app.py` locally...
+Running locally...
 
+Start by booting up the app:
+
+```bash
+python zwazam_api.py
+```
+
+In a different terminal you can do:
 
 #### Example with `curl`:
 
@@ -24,3 +31,5 @@ response = requests.post('http://127.0.0.1:5000/predict',
                          json={'example': [154]})
 print response.json()
 ```
+
+#### A usage example with real data is here: [test_api](test_api.py)

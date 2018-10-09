@@ -38,13 +38,13 @@ def api_information():
 def match_provided_track():
 
     data = flask.request.json
-    waveform = np.array(data["waveform"]).reshape(-1,1)
+    waveform = np.array(data["waveform"]).ravel()
     datatype = waveform.dtype
     new_track = None
     if datatype == 'B':
         new_track = BinaryStreamFingerprint(waveform, min_peak_amplitude=MIN_FINGER_PRINT_MIC)
     elif datatype == int or datatype == float:
-        new_track = StreamFingerprint(waveform, min_peak_amplitude=MIN_FINGER_PRINT_MIC)
+        new_track = StreamFingerprint(waveform, min_peak_amplitude=MIN_FINGER_PRINT_WAV)
     else:
         print(api_information)
 
@@ -52,19 +52,14 @@ def match_provided_track():
     del waveform
     del data
     del new_track
-    return best_match
+    return flask.jsonify({"result": best_match})
 
 @app.route("/add_track_to_database", methods=["POST"])
 def add_track_to_database():
     data = flask.request.json
     waveform = np.array(data["waveform"]).reshape(-1,1)
     track_name = str(data['name'])
-    datatype = waveform.dtype
-    new_track = None
-    if datatype == 'B':
-        new_track = BinaryStreamFingerprint(waveform, min_peak_amplitude=MIN_FINGER_PRINT_MIC)
-    elif datatype == int or datatype == float:
-        new_track = StreamFingerprint(waveform, min_peak_amplitude=MIN_FINGER_PRINT_MIC)
+    new_track = StreamFingerprint(waveform, min_peak_amplitude=MIN_FINGER_PRINT_WAV)
     if new_track:
         for hash in set(new_track.hashes):
             cursor.execute(base_insert_query.format(str(track_name), int(hash)))
