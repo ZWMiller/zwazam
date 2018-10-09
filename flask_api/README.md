@@ -1,6 +1,4 @@
-# A simple model-based prediction app
-
-Running `predictor_app.py` locally...
+# A simple song fingerprint app
 
 
 #### Example with `curl`:
@@ -8,7 +6,7 @@ Running `predictor_app.py` locally...
 ```bash
 curl http://127.0.0.1:5000
 
-curl http://127.0.0.1:5000/predict -X POST -H 'Content-Type: application/json' -d '{"example": [154]}'
+curl http://127.0.0.1:5000/match -X POST -H 'Content-Type: application/json' -d '{"waveform": [11,20,31,4,5,6,73,...]}'
 ```
 
 
@@ -18,9 +16,9 @@ curl http://127.0.0.1:5000/predict -X POST -H 'Content-Type: application/json' -
 import requests
 
 response = requests.get('http://127.0.0.1:5000/')
-print response.text
+print(response.text)
 
-response = requests.post('http://127.0.0.1:5000/predict',
-                         json={'example': [154]})
+response = requests.post('http://127.0.0.1:5000/match',
+                         json={'example': [11,20,31,4,5,6,73,...]})
 print response.json()
 ```
