@@ -1,10 +1,4 @@
-<<<<<<< HEAD
-# A simple model-based prediction app
-
-Running locally...
-=======
 # A simple song fingerprint app
->>>>>>> 28423d6a3fa786091cd7f157c46e83fb6ccbca31
 
 Start by booting up the app:
 
