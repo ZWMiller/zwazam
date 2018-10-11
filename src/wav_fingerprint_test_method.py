@@ -1,16 +1,16 @@
 from scipy.io import wavfile
 import numpy as np
-from process_audio import ProcessAudio
+from process_audio_test_method import ProcessAudioTest
 
 
-class WavFingerprint(ProcessAudio):
+class WavFingerprint(ProcessAudioTest):
 
     def __init__(self, filename, **kwargs):
         """
         Class that reads in a wav file and uses the ProcessAudio methods
         to clean and fingerprint a given WAV. Loads the file, extracts left
         and right channels if available, then computes hashes from those
-        channels individually. All major methodology inherited from ProcessAudio
+        channels individually. All major methodology inherited from ProcessAudioTest
         super class.
 
         Input:
@@ -32,7 +32,8 @@ class WavFingerprint(ProcessAudio):
             self.process_track(self.raw_data_left)
 
 if __name__ == "__main__":
-    track = WavFingerprint("../test_wav/samples_for_test/Bust_This_subsection.wav", peak_sensitivity=20, min_peak_amplitude=40)
+    track = WavFingerprint("../test_wav/samples_for_test/Bust_This_subsection.wav", peak_sensitivity=20,
+                           min_peak_amplitude=40, look_forward_time=10)
     #track.process_track(track.raw_data_left)
     #print(len(track.hashes))
     #print(len(set(track.hashes)))

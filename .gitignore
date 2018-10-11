@@ -2,3 +2,5 @@
 .idea/*
 .DS_Store
 *.mp4
+generic_test_notebook.ipynb
+.ipynb_checkpoints/*
