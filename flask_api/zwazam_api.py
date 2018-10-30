@@ -2,6 +2,7 @@ import flask
 import numpy as np
 import sys
 import psycopg2 as pg
+import os
 from collections import defaultdict
 sys.path.append("../src")
 from binary_stream_fingerprint import BinaryStreamFingerprint
@@ -86,27 +87,32 @@ def compare_hashes(hashes):
         result = "No track found"
     return result
 
-@app.route('/wav_upload', methods=['GET', 'POST'])
+@app.route('/wav_upload', methods=['POST'])
 def upload_file():
-    if request.method == 'POST':
+    print("1")
+    if flask.request.method == 'POST':
+        print("2")
         # check if the post request has the file part
-        if 'file' not in request.files:
-            flash('No file part')
-            return redirect(request.url)
-        file = request.files['file']
+        if 'file' not in flask.request.files:
+            return {"result": "Invalid File Type"}
+
+        file = flask.request.files['file']
+        print("YEAH ", allowed_file(file.filename))
         # if user does not select file, browser also
         # submit a empty part without filename
         if file.filename == '':
-            flash('No selected file')
+            print('NAH')
             return {"result": "Invalid File Type"}
-        if file and allowed_file(file.filename):
+        if file:# and allowed_file(file.filename):
+            print("YEA")
+            print(file.filename)
             filename = secure_filename(file.filename)
             path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], filename)
             file.save(path_to_file)
-            track = WavFingerprint(path_to_file, peak_sensitivity=20,
+            new_track = WavFingerprint(path_to_file, peak_sensitivity=20,
                            min_peak_amplitude=40, look_forward_time=10)
             best_match = compare_hashes(new_track.hashes)
-            del track
+            del new_track
             os.remove(path_to_file)
             return flask.jsonify({"result": best_match})
 
