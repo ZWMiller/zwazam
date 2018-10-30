@@ -14,6 +14,12 @@ An example of the spectrogram and associated peaks can be seen here:
 
 ![Spectrogram and Peaks](images/spectrogram_peaks_demo.png)
 
+## Requirements
+
+* Python3 and a package manager (pip shown here, but conda will work)
+* `pip install scipy matplotlib numpy flask psycopg2 pyaudio requests`
+* Install Postgres SQL and init a database
+
 **THIS IS STILL UNDER CONSTRUCTION**
 
 #### Proof of Concept from WAV
