@@ -96,6 +96,7 @@ def upload_file():
         if 'file' not in flask.request.files:
             return {"result": "Invalid File Type"}
 
+        print(flask.request.files)
         file = flask.request.files['file']
         print("YEAH ", allowed_file(file.filename))
         # if user does not select file, browser also
