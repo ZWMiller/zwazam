@@ -92,11 +92,12 @@ def upload_file():
     print("1")
     if flask.request.method == 'POST':
         print("2")
+        print(flask.request.files)
         # check if the post request has the file part
         if 'file' not in flask.request.files:
             return {"result": "Invalid File Type"}
 
-        print(flask.request.files)
+
         file = flask.request.files['file']
         print("YEAH ", allowed_file(file.filename))
         # if user does not select file, browser also
