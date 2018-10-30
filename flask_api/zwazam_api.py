@@ -6,7 +6,13 @@ from collections import defaultdict
 sys.path.append("../src")
 from binary_stream_fingerprint import BinaryStreamFingerprint
 from stream_fingerprint import StreamFingerprint
+from wav_fingerprint import WavFingerprint
 from zwazam_settings import *
+from werkzeug.utils import secure_filename
+
+UPLOAD_FOLDER = 'temp_file_storage/'
+ALLOWED_EXTENSIONS = set(['.wav'])
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Initialize the app
 
@@ -78,6 +84,35 @@ def compare_hashes(hashes):
     except IndexError:
         result = "No track found"
     return result
+
+@app.route('/wav_upload', methods=['GET', 'POST'])
+def upload_file():
+    if request.method == 'POST':
+        # check if the post request has the file part
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        # if user does not select file, browser also
+        # submit a empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            return {"result": "Invalid File Type"}
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            path_to_file = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            file.save(path_to_file)
+            track = WavFingerprint(path_to_file, peak_sensitivity=20,
+                           min_peak_amplitude=40, look_forward_time=10)
+            best_match = compare_hashes(new_track.hashes)
+            del track
+            os.remove(path_to_file)
+            return flask.jsonify({"result": best_match})
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 
 
