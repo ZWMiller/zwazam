@@ -1,4 +1,5 @@
 # ZWAZAM: A less cool implementation of Shazam in Python
+**THIS PROJECT IS STILL UNDER CONSTRUCTION**
 
 This repo attempts to recreate the methodologies of Shazam using only Python
 libraries and some SQL. The main idea is to use the spectrogram (frequency, time vs relative strength in a 2D matrix)
@@ -20,7 +21,7 @@ An example of the spectrogram and associated peaks can be seen here:
 * `pip install scipy matplotlib numpy flask psycopg2 pyaudio requests`
 * Install Postgres SQL and init a database
 
-**THIS IS STILL UNDER CONSTRUCTION**
+## Usage
 
 #### Proof of Concept from WAV
 
@@ -40,3 +41,7 @@ Match Counts (not shown currently):
 #### Proof of Concept from Microphone
 
 See video here: https://youtu.be/YW9NZtL9Xi4
+
+#### Using the API 
+
+See README.md in [flask_api](flask_api)
