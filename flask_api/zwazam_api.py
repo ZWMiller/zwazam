@@ -12,11 +12,12 @@ from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'temp_file_storage/'
 ALLOWED_EXTENSIONS = set(['.wav'])
-app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
 # Initialize the app
 
 app = flask.Flask("zwazam")
+app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
+
 base_match_query = "SELECT track, count(hash) FROM zwazam WHERE hash = {} GROUP BY track"
 base_insert_query = "INSERT INTO zwazam(track, hash) VALUES ('{}', {});"
 connection_args = {
