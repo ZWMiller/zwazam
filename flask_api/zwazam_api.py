@@ -12,7 +12,7 @@ from zwazam_settings import *
 from werkzeug.utils import secure_filename
 
 UPLOAD_FOLDER = 'temp_file_storage/'
-ALLOWED_EXTENSIONS = set(['.wav'])
+ALLOWED_EXTENSIONS = set(['wav'])
 
 # Initialize the app
 
@@ -103,7 +103,7 @@ def upload_file():
         if file.filename == '':
             print('NAH')
             return {"result": "Invalid File Type"}
-        if file:# and allowed_file(file.filename):
+        if file and allowed_file(file.filename):
             print("YEA")
             print(file.filename)
             filename = secure_filename(file.filename)
